@@ -25,21 +25,23 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
         id += 1;
-        filmsList.put(id, film);
         film.setId(id);
+        filmsList.put(id, film);
         log.info("Movie added.");
+
         return film;
     }
 
     @PutMapping
     public Film updFilm(@Valid @RequestBody Film film) {
-        if (filmsList.containsKey(film.getId())) {
-            filmsList.put(film.getId(), film);
-            log.info("Movie update.");
-        } else {
+        if (!filmsList.containsKey(film.getId())) {
             log.warn("Attempt to update a non-existent movie.");
             throw new RuntimeException("User inst registered!");
         }
+
+        filmsList.put(film.getId(), film);
+        log.info("Movie update.");
+
         return film;
     }
 

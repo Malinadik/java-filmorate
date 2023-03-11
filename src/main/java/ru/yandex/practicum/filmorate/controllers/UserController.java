@@ -28,21 +28,23 @@ public class UserController {
             user.setName(user.getLogin());
         }
         id += 1;
-        userList.put(id, user);
         user.setId(id);
+        userList.put(id, user);
         log.info("User added.");
+
         return user;
     }
 
     @PutMapping
     public User updUser(@Valid @RequestBody User user) {
-        if (userList.containsKey(user.getId())) {
-            userList.put(user.getId(), user);
-            log.info("User update.");
-        } else {
+        if (!userList.containsKey(user.getId())) {
             log.warn("Attempt to update a non-existent user.");
             throw new RuntimeException("User inst registered!");
         }
+
+        userList.put(user.getId(), user);
+        log.info("User update.");
+
         return user;
     }
 }
