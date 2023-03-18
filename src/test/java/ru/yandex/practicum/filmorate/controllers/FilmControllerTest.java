@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.exceptions.DuplicateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,8 +35,7 @@ class FilmControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    private FilmService filmService;
-    FilmController filmController = new FilmController(filmService);
+    FilmController filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
     @MockBean
     FilmController service;
 
@@ -42,6 +43,8 @@ class FilmControllerTest {
             .addModule(new JavaTimeModule())
             .build();
     URI uri = new URI("http://localhost:8080/films");
+
+
 
     @Test
     void getFilmsList() throws Exception {
@@ -62,6 +65,8 @@ class FilmControllerTest {
 
         mvc.perform(put(uri).content(json).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
+
+
     }
 
     @Test
@@ -142,6 +147,7 @@ class FilmControllerTest {
         Assertions.assertEquals("Test1", filmController.getFilmsList().get(1).getName());
         filmController.updFilm(film3);
         Assertions.assertEquals("TestTest", filmController.getFilmsList().get(0).getName());
+
     }
 }
 
