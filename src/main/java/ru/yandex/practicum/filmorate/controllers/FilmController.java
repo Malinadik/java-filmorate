@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class FilmController {
     private final FilmService filmService;
 
