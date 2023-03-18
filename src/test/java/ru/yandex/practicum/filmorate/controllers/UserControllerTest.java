@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,7 +32,9 @@ class UserControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    UserController uc = new UserController();
+    private UserService userService;
+
+    UserController uc = new UserController(userService);
     @MockBean
     UserController service;
 
