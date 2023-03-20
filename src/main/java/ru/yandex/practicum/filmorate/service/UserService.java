@@ -50,11 +50,11 @@ public class UserService {
     }
 
     public Set<User> getUsersCommonFriends(Integer id, Integer otherId) {
-        User user0 = getUserById(id);
-        User user1 = getUserById(otherId);
+        User user = getUserById(id);
+        User other = getUserById(otherId);
         Set<User> commonFriends = new HashSet<>();
-        for (Integer friend : user0.getFriends()) {
-            if (user1.getFriends().contains(friend)) {
+        for (Integer friend : user.getFriends()) {
+            if (other.getFriends().contains(friend)) {
                 commonFriends.add(getUserById(friend));
             }
         }
@@ -66,11 +66,11 @@ public class UserService {
             throw new DuplicateException("User can't add own page to friends!");
         }
         User user = getUserById(id);
-        User user1 = getUserById(friendId);
+        User friend = getUserById(friendId);
         user.getFriends().add(friendId);
-        user1.getFriends().add(id);
+        friend.getFriends().add(id);
         userStorage.updateUser(user);
-        userStorage.updateUser(user1);
+        userStorage.updateUser(friend);
         return user;
     }
 

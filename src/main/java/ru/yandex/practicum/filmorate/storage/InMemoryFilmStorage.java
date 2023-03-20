@@ -35,7 +35,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (filmsList.containsValue(film)) {
             throw new DuplicateException("Film already added!");
         }
-        id += 1;
+        ++id;
         film.setId(id);
         filmsList.put(id, film);
         return film;
