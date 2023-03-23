@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,7 +33,7 @@ class UserControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    UserController uc = new UserController();
+    UserController uc = new UserController(new UserService(new InMemoryUserStorage()));
     @MockBean
     UserController service;
 

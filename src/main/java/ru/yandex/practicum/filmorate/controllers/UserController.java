@@ -1,50 +1,64 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.DuplicateException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
+@AllArgsConstructor
 public class UserController {
-    private final HashMap<Integer, User> userList = new HashMap<>();
-    private int id = 0;
+
+    private final UserService userService;
 
     @GetMapping
     public List<User> getUserList() {
-        return new ArrayList<>(userList.values());
+        return userService.getUsersList();
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Integer id) {
+        return userService.getUserById(id);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getUserFriendList(@PathVariable Integer id) {
+        return userService.getUsersFrendsList(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Set<User> getCommonFriends(@PathVariable Integer id
+            , @PathVariable Integer otherId) throws RuntimeException {
+        return userService.getUsersCommonFriends(id, otherId);
     }
 
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
-        id += 1;
-        user.setId(id);
-        userList.put(id, user);
-        log.info("User added.");
-
-        return user;
+        return userService.addUser(user);
     }
 
     @PutMapping
     public User updUser(@Valid @RequestBody User user) {
-        if (!userList.containsKey(user.getId())) {
-            log.warn("Attempt to update a non-existent user.");
-            throw new RuntimeException("User inst registered!");
-        }
+        return userService.updateUser(user);
+    }
 
-        userList.put(user.getId(), user);
-        log.info("User update.");
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws DuplicateException {
+        return userService.addFriend(id, friendId);
+    }
 
-        return user;
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws DuplicateException {
+        return userService.deleteFriend(id, friendId);
     }
 }
