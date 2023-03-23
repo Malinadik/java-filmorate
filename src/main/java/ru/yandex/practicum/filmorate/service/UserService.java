@@ -76,14 +76,14 @@ public class UserService {
 
     public User deleteFriend(Integer id, Integer friendId) throws DuplicateException {
         User user = getUserById(id);
-        User user1 = getUserById(friendId);
-        if (!user.getFriends().contains(friendId) || !user1.getFriends().contains(id)) {
+        User friend = getUserById(friendId);
+        if (!user.getFriends().contains(friendId) || !friend.getFriends().contains(id)) {
             throw new DuplicateException("Users not friends yet!");
         }
         user.getFriends().remove(friendId);
-        user1.getFriends().remove(id);
+        friend.getFriends().remove(id);
         userStorage.updateUser(user);
-        userStorage.updateUser(user1);
+        userStorage.updateUser(friend);
         return user;
     }
 
