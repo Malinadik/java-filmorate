@@ -7,7 +7,7 @@
 Информация о друзьях будет браться из таблицы friends по id пользователя.
 
 Пример запроса:
-SELECT *
+SELECT * 
 FROM friends
 WHERE id = 1;
 
