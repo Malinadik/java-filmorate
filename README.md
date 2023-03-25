@@ -1,6 +1,6 @@
 # java-filmorate
 
-##Схема Базы данных
+## Схема Базы данных
 
 <picture>
   <img src="filmorate.png">
