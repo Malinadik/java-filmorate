@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,25 +21,25 @@ public class UserService {
         return userStorage.getUsersList();
     }
 
-    public User addUser(User user) {
+    public User addUser(User user) throws DuplicateException {
         if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
         }
         return userStorage.addUser(user);
     }
 
-    public User updateUser(User user) {
+    public User updateUser(User user) throws DuplicateException {
         if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
         }
         return userStorage.updateUser(user);
     }
 
-    public User getUserById(Integer id) {
+    public User getUserById(Integer id) throws DuplicateException {
         return userStorage.getUserById(id);
     }
 
-    public List<User> getUsersFrendsList(Integer id) {
+    public List<User> getUsersFrendsList(Integer id) throws DuplicateException {
         User user = getUserById(id);
         List<User> friendList = new ArrayList<>();
         for (Integer friendId : user.getFriends()) {
@@ -49,43 +48,33 @@ public class UserService {
         return friendList;
     }
 
-    public Set<User> getUsersCommonFriends(Integer id, Integer otherId) {
-        User user = getUserById(id);
-        User other = getUserById(otherId);
-        Set<User> commonFriends = new HashSet<>();
-        for (Integer friend : user.getFriends()) {
-            if (other.getFriends().contains(friend)) {
-                commonFriends.add(getUserById(friend));
-            }
-        }
-        return commonFriends;
+    public Set<User> getUsersCommonFriends(Integer id, Integer otherId) throws DuplicateException {
+        User user0 = getUserById(id);// тоже для проверки, есть ли юзер
+        User user1 = getUserById(otherId);
+        return userStorage.getCommonFriends(id, otherId);
     }
 
-    public User addFriend(Integer id, Integer friendId) throws DuplicateException {
+    public int addFriend(Integer id, Integer friendId) throws DuplicateException {
         if (id == friendId) {
             throw new DuplicateException("User can't add own page to friends!");
         }
-        User user = getUserById(id);
-        User friend = getUserById(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
-        return user;
+        if (getUserById(id).getFriends().contains(friendId)) {
+            throw new DuplicateException("You already send a request!");
+        }
+        getUserById(friendId);
+        return userStorage.addFriend(id, friendId);
     }
 
-    public User deleteFriend(Integer id, Integer friendId) throws DuplicateException {
+    public int deleteFriend(Integer id, Integer friendId) throws DuplicateException {
         User user = getUserById(id);
-        User friend = getUserById(friendId);
-        if (!user.getFriends().contains(friendId) || !friend.getFriends().contains(id)) {
+        if (!user.getFriends().contains(friendId)) {
             throw new DuplicateException("Users not friends yet!");
         }
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
-        return user;
+        return userStorage.deleteFriend(id, friendId);
     }
 
 }
+
+
+
 

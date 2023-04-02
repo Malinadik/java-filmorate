@@ -28,7 +28,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowable(final Exception e) {
+    public ErrorResponse handleThrowable(final Throwable e) {
         return new ErrorResponse("Internal Server error", e.getMessage());
     }
 }

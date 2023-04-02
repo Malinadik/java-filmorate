@@ -9,6 +9,7 @@ import javax.validation.constraints.*;
 import javax.validation.executable.ValidateOnExecution;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -29,6 +30,8 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private Long duration;
-
+    private List<Genre> genres;
+    private MPARating mpa;
     private final Set<Integer> userLikes = new HashSet<>();
+
 }
