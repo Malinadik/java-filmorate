@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.util.LikesComparator;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Component("InMemory")
 public class InMemoryFilmStorage implements FilmStorage {
     private final Comparator<Film> likesComparator = new LikesComparator();
     protected final Set<Film> filmsRating = new TreeSet<>(likesComparator);
@@ -32,23 +32,33 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) throws DuplicateException {
+        id += 1;
+        film.setId(id);
         if (filmsList.containsValue(film)) {
             throw new DuplicateException("Film already added!");
         }
-        ++id;
-        film.setId(id);
         filmsList.put(id, film);
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        if (!filmsList.containsKey(film.getId())) {
+        if (filmsList.containsKey(film.getId())) {
+            filmsList.put(film.getId(), film);
+        } else {
             throw new NotFoundException("Film not found!");
-
         }
-        filmsList.put(film.getId(), film);
         return film;
+    }
+
+    @Override
+    public Film likeFilm(Integer id, Integer userId) {
+        return null;// по прошлым тз, тут их быть не должно, поэтому добавила такие заглушки
+    }
+
+    @Override
+    public Film unlikeFilm(Integer id, Integer userId) {
+        return null;
     }
 
     @Override

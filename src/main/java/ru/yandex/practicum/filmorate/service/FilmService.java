@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.DuplicateException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
@@ -9,12 +10,15 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
+
+    @Autowired
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
@@ -27,28 +31,35 @@ public class FilmService {
     }
 
     public Film addFilm(Film film) throws DuplicateException {
+        if (film.getGenres() == null) {
+            film.setGenres(new ArrayList<>());
+        }
         return filmStorage.addFilm(film);
     }
 
     public Film updateFilm(Film film) {
+        if (film.getGenres() == null) {
+            film.setGenres(new ArrayList<>());
+        }
         return filmStorage.updateFilm(film);
     }
 
-    public Film likeFilm(Integer id, Integer userId) {
-        userStorage.getUserById(userId); // немного костыль, но как мне кажется, самы простой способ проверить, что юзер есть - если его нет, то будет исключние
+    public Film likeFilm(Integer id, Integer userId) throws DuplicateException {
+        userStorage.getUserById(userId);
         Film film = filmStorage.getFilmById(id);
-        film.getUserLikes().add(userId);
-        filmStorage.updateFilm(film);
+        if (film.getUserLikes().contains(userId)) {
+            throw new DuplicateException("You already liked it!");
+        }
+        filmStorage.likeFilm(id, userId);
         return film;
     }
 
     public Film unlikeFilm(Integer id, Integer userId) {
         Film film = filmStorage.getFilmById(id);
         if (!film.getUserLikes().contains(userId)) {
-            throw new NotFoundException("Film not found!");
+            throw new NotFoundException("User not found!");
         }
-        film.getUserLikes().remove(userId);
-        filmStorage.updateFilm(film);
+        filmStorage.unlikeFilm(id, userId);
         return film;
     }
 

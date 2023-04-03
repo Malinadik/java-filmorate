@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/users")
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
@@ -27,38 +26,38 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Integer id) {
+    public User getUserById(@PathVariable Integer id) throws DuplicateException {
         return userService.getUserById(id);
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getUserFriendList(@PathVariable Integer id) {
+    public List<User> getUserFriendList(@PathVariable Integer id) throws DuplicateException {
         return userService.getUsersFrendsList(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Set<User> getCommonFriends(@PathVariable Integer id
-            , @PathVariable Integer otherId) throws RuntimeException {
+    public Set<User> getCommonFriends(@PathVariable Integer id,
+                                      @PathVariable Integer otherId) throws DuplicateException {
         return userService.getUsersCommonFriends(id, otherId);
     }
 
     @PostMapping
-    public User addUser(@Valid @RequestBody User user) {
+    public User addUser(@Valid @RequestBody User user) throws DuplicateException {
         return userService.addUser(user);
     }
 
     @PutMapping
-    public User updUser(@Valid @RequestBody User user) {
+    public User updUser(@Valid @RequestBody User user) throws DuplicateException {
         return userService.updateUser(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws DuplicateException {
+    public int addFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws DuplicateException {
         return userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws DuplicateException {
+    public int deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) throws DuplicateException {
         return userService.deleteFriend(id, friendId);
     }
 }

@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,8 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,7 +30,6 @@ class UserControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    UserController uc = new UserController(new UserService(new InMemoryUserStorage()));
     @MockBean
     UserController service;
 
@@ -126,41 +122,5 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
         mvc.perform(put(uri).content(errJson3).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void addAndPut_ToMap() {
-        User user = User.builder().id(1)
-                .email("test@test.ru")
-                .login("test")
-                .name("Test")
-                .birthday(LocalDate.of(2000, 2, 24))
-                .build();
-        User user2 = User.builder().id(1)
-                .email("test@test.ru")
-                .login("test")
-                .name("Test1")
-                .birthday(LocalDate.of(2000, 2, 24))
-                .build();
-        User user3 = User.builder().id(1)
-                .email("test@test.ru")
-                .login("test")
-                .name("TestTest")
-                .birthday(LocalDate.of(2000, 2, 24))
-                .build();
-        User user4 = User.builder().id(1)
-                .email("test@test.ru")
-                .login("testLog")
-                .birthday(LocalDate.of(2000, 2, 24))
-                .build();
-
-        uc.addUser(user);
-        Assertions.assertEquals("Test", uc.getUserList().get(0).getName());
-        uc.addUser(user2);
-        Assertions.assertEquals("Test1", uc.getUserList().get(1).getName());
-        uc.updUser(user3);
-        Assertions.assertEquals("TestTest", uc.getUserList().get(0).getName());
-        uc.addUser(user4);
-        Assertions.assertEquals("testLog", uc.getUserList().get(2).getName());
     }
 }

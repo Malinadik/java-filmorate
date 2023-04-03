@@ -15,5 +15,9 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
+    Film likeFilm(Integer id, Integer userId);
+
+    Film unlikeFilm(Integer id, Integer userId);
+
     List<Film> getMostPopularFilms(int count);
 }
