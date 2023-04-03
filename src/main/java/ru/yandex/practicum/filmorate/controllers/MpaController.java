@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.MPARating;
 import ru.yandex.practicum.filmorate.storage.dao.FilmDao;
+import ru.yandex.practicum.filmorate.storage.dao.MpaDao;
 
 import java.util.List;
 
@@ -16,15 +17,15 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class MpaController {
-    private final FilmDao filmDao;
+    private final MpaDao mpaDao;
 
     @GetMapping
     public List<MPARating> getRatings() {
-        return filmDao.getMPAS();
+        return mpaDao.getMPAS();
     }
 
     @GetMapping("/{id}")
     public MPARating getGenreByID(@PathVariable Integer id) {
-        return filmDao.getMPAbyId(id);
+        return mpaDao.getMPAbyId(id);
     }
 }

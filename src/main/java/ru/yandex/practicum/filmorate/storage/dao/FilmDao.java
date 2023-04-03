@@ -25,10 +25,31 @@ public class FilmDao implements FilmStorage {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private MpaDao mpaDao;
+    @Autowired
+    private GenreDao genreDao;
+
     @Override
     public List<Film> getFilmsList() {
+        List<Film> films = new ArrayList<>();
         String sqlQuery = "select * from FILM";
-        return List.copyOf(jdbcTemplate.query(sqlQuery, (rs, rowNum) -> convert(rs)));
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sqlQuery);
+        String getLikes = "select USER_ID from USER_LIKES where FILM_ID = ?";
+        while (filmRows.next()) {
+            Film film = Film.builder().id(filmRows.getInt("id"))
+                    .name(filmRows.getString("name"))
+                    .description(filmRows.getString("description"))
+                    .duration(filmRows.getLong("duration"))
+                    .releaseDate(filmRows.getDate("releasedate").toLocalDate())
+                    .genres(convert(filmRows.getInt("id")))
+                    .mpa(new MPARating(filmRows.getInt("MPARating_id"),
+                            mpaDao.getMPAbyId(filmRows.getInt("MPARating_id")).getName()))
+                    .build();
+            film.getUserLikes().addAll(jdbcTemplate.queryForList(getLikes, Integer.class, filmRows.getInt("id")));
+            films.add(film);
+        }
+        return films;
     }
 
     @Override
@@ -43,7 +64,7 @@ public class FilmDao implements FilmStorage {
                     .releaseDate(filmRows.getDate("releasedate").toLocalDate())
                     .genres(convert(id))
                     .mpa(new MPARating(filmRows.getInt("MPARating_id"),
-                            getMPAbyId(filmRows.getInt("MPARating_id")).getName()))
+                            mpaDao.getMPAbyId(filmRows.getInt("MPARating_id")).getName()))
                     .build();
             film.getUserLikes().addAll(jdbcTemplate.queryForList(getLikes, Integer.class, id));
             return film;
@@ -69,7 +90,7 @@ public class FilmDao implements FilmStorage {
         }, kh);
         film.setId(kh.getKey().intValue());
         System.out.println(film.getId());
-        if (getGenres() != null) {
+        if (genreDao.getGenres() != null) {
             convert(film.getId(), film.getGenres());
         }
         if (!film.getUserLikes().isEmpty()) {
@@ -141,44 +162,6 @@ public class FilmDao implements FilmStorage {
         return film;
     }
 
-    public List<MPARating> getMPAS() {
-        String sqlGetAll = "select ID, RATING_NAME from MPARATING";
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlGetAll);
-        List<MPARating> ratings = new ArrayList<>();
-        while (rs.next()) {
-            MPARating mpaRating = new MPARating(rs.getInt("ID"), rs.getString("RATING_NAME"));
-            ratings.add(mpaRating);
-        }
-        return ratings;
-    }
-
-    public MPARating getMPAbyId(Integer id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from MPARATING where ID = ?", id);
-        if (!filmRows.next()) {
-            throw new NotFoundException("MPA not find!");
-        }
-        return new MPARating(filmRows.getInt(1), filmRows.getString(2));
-    }
-
-    public List<Genre> getGenres() {
-        String sqlGetAll = "select ID, GENRE_NAME from GENRES";
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlGetAll);
-        List<Genre> genres = new ArrayList<>();
-        while (rs.next()) {
-            Genre genre = new Genre(rs.getInt("ID"), rs.getString("GENRE_NAME"));
-            genres.add(genre);
-        }
-        return genres;
-    }
-
-    public Genre getGenreById(Integer id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from GENRES where ID = ?", id);
-        if (!filmRows.next()) {
-            throw new NotFoundException("Genre not find!");
-        }
-        return new Genre(filmRows.getInt(1), filmRows.getString(2));
-    }
-
     private Film convert(ResultSet rs) throws SQLException {
         String getLikes = "select USER_ID from USER_LIKES where FILM_ID = ?";
         Film film = Film.builder().id(rs.getInt("id"))
@@ -188,7 +171,7 @@ public class FilmDao implements FilmStorage {
                 .releaseDate(rs.getDate("releasedate").toLocalDate())
                 .genres(convert(rs.getInt("id")))
                 .mpa(new MPARating(rs.getInt("MPARating_id"),
-                        getMPAbyId(rs.getInt("MPARating_id")).getName()))
+                        mpaDao.getMPAbyId(rs.getInt("MPARating_id")).getName()))
                 .build();
         film.getUserLikes().addAll(jdbcTemplate.queryForList(getLikes, Integer.class, film.getId()));
         return film;
@@ -202,7 +185,7 @@ public class FilmDao implements FilmStorage {
             return genres;
         }
         for (Integer gID : genresId) {
-            Genre genre = new Genre(gID, this.getGenreById(gID).getName());
+            Genre genre = new Genre(gID, genreDao.getGenreById(gID).getName());
             if (!genres.contains(genre)) {
                 genres.add(genre);
             }

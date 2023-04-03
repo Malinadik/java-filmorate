@@ -26,6 +26,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class FilmDaoTest {
     private final FilmDao filmStorage;
     private final UserDao userDao;
+    private final MpaDao mpaDao;
+    private final GenreDao genreDao;
 
     @Order(1)
     @Test
@@ -140,25 +142,25 @@ public class FilmDaoTest {
 
     @Test
     void testGetAllMpa() {
-        List<MPARating> mpaRatingList = filmStorage.getMPAS();
+        List<MPARating> mpaRatingList = mpaDao.getMPAS();
         assertThat(mpaRatingList.size()).isEqualTo(5);
     }
 
     @Test
     public void testGetMpaById() {
-        MPARating mpaRating = filmStorage.getMPAbyId(1);
+        MPARating mpaRating = mpaDao.getMPAbyId(1);
         assertThat(mpaRating).hasFieldOrPropertyWithValue("id", 1);
     }
 
     @Test
     void testGetAllGenres() {
-        List<Genre> genres = filmStorage.getGenres();
+        List<Genre> genres = genreDao.getGenres();
         assertThat(genres.size()).isEqualTo(6);
     }
 
     @Test
     public void testGetGenreById() {
-        Genre genre = filmStorage.getGenreById(1);
+        Genre genre = genreDao.getGenreById(1);
         assertThat(genre).hasFieldOrPropertyWithValue("id", 1);
     }
 }
