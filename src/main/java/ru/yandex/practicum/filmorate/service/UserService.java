@@ -49,8 +49,8 @@ public class UserService {
     }
 
     public Set<User> getUsersCommonFriends(Integer id, Integer otherId) throws DuplicateException {
-        User user0 = getUserById(id);// тоже для проверки, есть ли юзер
-        User user1 = getUserById(otherId);
+        User user = getUserById(id);// тоже для проверки, есть ли юзер
+        User other = getUserById(otherId);
         return userStorage.getCommonFriends(id, otherId);
     }
 
